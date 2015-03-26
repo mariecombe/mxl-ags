@@ -1,0 +1,47 @@
+#!/bin/bash
+
+###### USER DEFINED : ######
+
+Listoffiles="namoptions_cc*wg*"
+Outputdir="TESTEST"
+
+############################
+
+cd ../
+find Files_scripts/create_sensitivity/ -name ${Listoffiles} | xargs -I '{}' mv {} .
+
+rm SensitivityRuns.txt
+#rm -r SENS_wg*
+#rm -r SENS_th*
+
+cp namoptions namoptions.saved
+
+for i in ${Listoffiles}
+do
+filetemp="$(echo ${i}|cut -d'_' -f2)" #filetemp is the part writen after 'namoptions_' in each 'nam*' filename (th001...)
+if [[ $filetemp != "" ]]
+then
+echo "Executing Sensitivity run $filetemp"
+echo "===================================" >> SensitivityRuns.txt
+echo "Executing Sensitivity run $filetemp" >> SensitivityRuns.txt
+echo "===================================" >> SensitivityRuns.txt
+echo " " >> SensitivityRuns.txt
+cp namoptions_$filetemp namoptions
+#cp chem.inp_$filetemp chem.inp
+./expanded_MXL.exe >> SensitivityRuns.txt
+echo " " >> SensitivityRuns.txt
+echo " " >> SensitivityRuns.txt
+echo " " >> SensitivityRuns.txt
+fi
+done
+rm namoptions
+cp namoptions.saved namoptions
+
+Listofdirs="SENS_*"
+echo "Removing old directory $Outputdir"
+rm -r ${Outputdir}
+echo "Creating new directory $Outputdir"
+mkdir ${Outputdir}
+echo "Moving files to directory $Outputdir"
+mv ${Listoffiles} ${Outputdir}/
+mv ${Listofdirs} ${Outputdir}/

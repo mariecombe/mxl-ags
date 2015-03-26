@@ -1,0 +1,75 @@
+How to make a sensitivity analysis of the MXL-AGs model
+
+0) Prepare the war zone
+-----------------------------------------
+- remove all old sensitivity runs 
+- check the namoptions file in ~/Modelling/MXL/MLmodel/ is it the correct control case?
+- copy the control case namoptions to directory Files_script/create_sensitivity/ and rename it namoptions_
+
+
+1) create the namoptions files
+--------------------------------------------------
+-	open a sensitivityvarname file script (eg: 'sensitivitywg') in Users / mariecombe / Modeling / MXL / MLmodel /
+-	save it under a new name: eg. sensitivitythetam0 (here because we want to vary the parameter thetam0).
+-	Do a 'Replace all' manip: replace the old variable name (ex: 'wg') by the new variable name (in our example: 'thetam0') with the options:
+	'Ignore case' OFF ; 
+	'Match whole word only' OFF
+-	change the range of values you want to apply
+	1- define the range you want, divide it by 100, you get the step S you need to apply to get 101 values, 
+	eg. for P4: I want to get 101 values between 0. and 15. --> S = 0.15, In python write:
+	> import numpy
+	> a = numpy.arange(0,15.15,0.15)
+	> for i,val in enumerate(a):
+	> print 'P4[%d]=%.2f'%(i+1,val)
+	and copy paste the result in the file
+-	update the total number of values 'amountthetam0' you want to apply
+-	change the original value of thetam0 under the first sed command, AND the line number at which the variable is found
+-	change the directory name under the second sed command if needed (original directory name? or just 'SENS_' ?)
+-	finally: change the Listoffiles variables so that it recognizes the right amount of namoptions_ files ('namoptions_* ? or 'namoptions_var1*' ? depends if you are creating the first round of namoptions files or building on it)
+-	Save this 'sensitivityvarname' file
+Do everything listed above again for a second variable: eg. cm0.
+Run the first file, then the second. 
+Check your created namoptions file to see if everything went well.
+
+2) copy all namoptions to ~/Modelling/MXL/MLmodel/
+---------------------------------------------------------------------------------
+find.....
+
+2) Run the model for all the namoptions files created
+---------------------------------------------------------------------------------
+NB: you can launch tmux -CC now, in case you have a large amount of runs to complete
+
+Open the 'executeRUNS' file in the same folder.
+Change the 'Listoffiles' variable so that it recognizes the right combination of variables (eg. in our case: 'namoptions_th*cm*')
+Change the 'Outputdir' variable: this is the name of the directory where all the output will be saved.
+Save the file
+Run this script
+
+
+3) Extract the interesting data into a single file
+-----------------------------------------------------------------------
+Open the 'analyzeSENS.py' file in the same folder
+Update the Var1, Var2 names and their ranges of values
+If needed: update the variables being written to the Results file
+Save the file
+Run the script under the interactive python interface (for debugging)
+
+
+4) Plot the data
+--------------------------
+Open the 'plotSENS.py' file in the same folder
+Copy Paste the variables names and their ranges of values from 'analyzeSENS.py'
+Save the file
+Run the script under the interactive python interface (for debugging)
+Check your plots. Is it what you expected?
+
+5) The spring cleaning
+----------------------------------
+If you have successfully completed your runs and your analysis, you can do:
+rm -r SENS_*
+cp namoptions.saved namoptions
+rm -f namoptions_*
+
+OR
+
+just move the SENS_* directories and the namoptions_* files to a new directory like SENS_thetam0_cm0

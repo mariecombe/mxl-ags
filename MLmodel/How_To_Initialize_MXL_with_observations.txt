@@ -1,0 +1,18 @@
+How to initialize the MXL model:
+
+-A- Run general settings
+how many hours to run (from what time to which time)?
+starts at what hour?
+lat? lon? day? important: will determine your Qnet if radiation scheme is ON
+output directory name?
+
+-B- Fixed surface fluxes
+Look in the observations and convert max.SH and max.LE from W/m2 to K.m/s and g/kg.m/s
+wthetamax = max.SH * ...
+wqsmax = max.LE * ...
+Then:
+	1- First you need to initialize temperature : play with thetam0, dthetam0 and gamma
+	⁃	thetam0: it is in the observations (temperature not close to sfc, at start time of run)
+	⁃	dthetam0: influences the start of the theta curve, and the speed at which h rises.
+	⁃	gamma: influences the last part of the curve. high gamma == higher increase of thetam after the initial temperature jump has been absorbed. NB: this has a strong impact on development of BL height.
+		

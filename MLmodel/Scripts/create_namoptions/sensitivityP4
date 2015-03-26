@@ -1,0 +1,136 @@
+#!/bin/bash
+# this script will produce one namoptions file for each of the values we want to try for the sensitivity analysis of P4
+
+#rm namoptions_w*
+#rm chem.inp_w*
+
+# this file contains values of P4 manually defined:
+# 25 first values: linear increase of P4 from 0 to 1.6
+# 25 second values: linear increase of P4 from 1.6 to 3.5
+# last 51 values: P4=(2**x)-1 with x varying between 2.17 to 4 (P4 varying exponentially from 3.5 to 15)
+
+Listoffiles="namoptions_*"
+amountP4=101
+P4[1]=1.000e-06
+P4[2]=6.400e-02
+P4[3]=1.280e-01
+P4[4]=1.920e-01
+P4[5]=2.560e-01
+P4[6]=3.200e-01
+P4[7]=3.840e-01
+P4[8]=4.480e-01
+P4[9]=5.120e-01
+P4[10]=5.760e-01
+P4[11]=6.400e-01
+P4[12]=7.040e-01
+P4[13]=7.680e-01
+P4[14]=8.320e-01
+P4[15]=8.960e-01
+P4[16]=9.600e-01
+P4[17]=1.024e+00
+P4[18]=1.088e+00
+P4[19]=1.152e+00
+P4[20]=1.216e+00
+P4[21]=1.280e+00
+P4[22]=1.344e+00
+P4[23]=1.408e+00
+P4[24]=1.472e+00
+P4[25]=1.536e+00
+P4[26]=1.600e+00
+P4[27]=1.676e+00
+P4[28]=1.752e+00
+P4[29]=1.828e+00
+P4[30]=1.904e+00
+P4[31]=1.980e+00
+P4[32]=2.056e+00
+P4[33]=2.132e+00
+P4[34]=2.208e+00
+P4[35]=2.284e+00
+P4[36]=2.360e+00
+P4[37]=2.436e+00
+P4[38]=2.512e+00
+P4[39]=2.588e+00
+P4[40]=2.664e+00
+P4[41]=2.740e+00
+P4[42]=2.816e+00
+P4[43]=2.892e+00
+P4[44]=2.968e+00
+P4[45]=3.044e+00
+P4[46]=3.120e+00
+P4[47]=3.196e+00
+P4[48]=3.272e+00
+P4[49]=3.348e+00
+P4[50]=3.424e+00
+P4[51]=3.500e+00
+P4[52]=3.616e+00
+P4[53]=3.734e+00
+P4[54]=3.856e+00
+P4[55]=3.981e+00
+P4[56]=4.109e+00
+P4[57]=4.240e+00
+P4[58]=4.375e+00
+P4[59]=4.513e+00
+P4[60]=4.655e+00
+P4[61]=4.800e+00
+P4[62]=4.949e+00
+P4[63]=5.102e+00
+P4[64]=5.258e+00
+P4[65]=5.419e+00
+P4[66]=5.584e+00
+P4[67]=5.753e+00
+P4[68]=5.927e+00
+P4[69]=6.105e+00
+P4[70]=6.287e+00
+P4[71]=6.475e+00
+P4[72]=6.667e+00
+P4[73]=6.864e+00
+P4[74]=7.066e+00
+P4[75]=7.273e+00
+P4[76]=7.486e+00
+P4[77]=7.704e+00
+P4[78]=7.927e+00
+P4[79]=8.157e+00
+P4[80]=8.392e+00
+P4[81]=8.633e+00
+P4[82]=8.881e+00
+P4[83]=9.134e+00
+P4[84]=9.395e+00
+P4[85]=9.662e+00
+P4[86]=9.936e+00
+P4[87]=1.022e+01
+P4[88]=1.051e+01
+P4[89]=1.080e+01
+P4[90]=1.110e+01
+P4[91]=1.141e+01
+P4[92]=1.173e+01
+P4[93]=1.206e+01
+P4[94]=1.240e+01
+P4[95]=1.274e+01
+P4[96]=1.309e+01
+P4[97]=1.346e+01
+P4[98]=1.383e+01
+P4[99]=1.421e+01
+P4[100]=1.460e+01
+P4[101]=1.500e+01
+
+
+for i in ${Listoffiles}
+do
+chemfiletemp="$(echo ${i}|cut -d'_' -f2)"
+chemfile="chem.inp_$chemfiletemp"
+for j in $(jot ${amountP4} 1) #from j=1 to j=101
+do
+nrP4="$(printf "%3.3d" $j)"
+
+#j="$(echo ${i}|cut -d'.' -f2)"
+cp $i ${i}P4$nrP4
+#cp $chemfile ${chemfile}P4$nrP4
+echo ${i}P4$nrP4
+sed -i '.saved' 126s/"0.000001"/"${P4[$j]}"/1 ${i}P4$nrP4  #sed will replace at line number 27
+							   #P4e original value 286. by a new value (looped)
+							   #in P4e file namoptions_P400X (looped)
+							   #it will also save a backup file "namoptions_P400X.saved"
+sed -i '.saved' 4s/"OBS04AUG2007"/"SENS_P4$nrP4"/1 ${i}P4$nrP4
+rm -f *saved
+done
+done

@@ -1,0 +1,131 @@
+#!/bin/bash
+# this script will produce one namoptions file for each of the values we want to try for the sensitivity analysis of gammaq
+
+#rm namoptions_w*
+#rm chem.inp_w*
+
+Listoffiles="namoptions_cc*"
+amountga=101
+ga[1]=0.00200
+ga[2]=0.00206
+ga[3]=0.00212
+ga[4]=0.00218
+ga[5]=0.00224
+ga[6]=0.00230
+ga[7]=0.00236
+ga[8]=0.00242
+ga[9]=0.00248
+ga[10]=0.00254
+ga[11]=0.00260
+ga[12]=0.00266
+ga[13]=0.00272
+ga[14]=0.00278
+ga[15]=0.00284
+ga[16]=0.00290
+ga[17]=0.00296
+ga[18]=0.00302
+ga[19]=0.00308
+ga[20]=0.00314
+ga[21]=0.00320
+ga[22]=0.00326
+ga[23]=0.00332
+ga[24]=0.00338
+ga[25]=0.00344
+ga[26]=0.00350
+ga[27]=0.00356
+ga[28]=0.00362
+ga[29]=0.00368
+ga[30]=0.00374
+ga[31]=0.00380
+ga[32]=0.00386
+ga[33]=0.00392
+ga[34]=0.00398
+ga[35]=0.00404
+ga[36]=0.00410
+ga[37]=0.00416
+ga[38]=0.00422
+ga[39]=0.00428
+ga[40]=0.00434
+ga[41]=0.00440
+ga[42]=0.00446
+ga[43]=0.00452
+ga[44]=0.00458
+ga[45]=0.00464
+ga[46]=0.00470
+ga[47]=0.00476
+ga[48]=0.00482
+ga[49]=0.00488
+ga[50]=0.00494
+ga[51]=0.00500
+ga[52]=0.00506
+ga[53]=0.00512
+ga[54]=0.00518
+ga[55]=0.00524
+ga[56]=0.00530
+ga[57]=0.00536
+ga[58]=0.00542
+ga[59]=0.00548
+ga[60]=0.00554
+ga[61]=0.00560
+ga[62]=0.00566
+ga[63]=0.00572
+ga[64]=0.00578
+ga[65]=0.00584
+ga[66]=0.00590
+ga[67]=0.00596
+ga[68]=0.00602
+ga[69]=0.00608
+ga[70]=0.00614
+ga[71]=0.00620
+ga[72]=0.00626
+ga[73]=0.00632
+ga[74]=0.00638
+ga[75]=0.00644
+ga[76]=0.00650
+ga[77]=0.00656
+ga[78]=0.00662
+ga[79]=0.00668
+ga[80]=0.00674
+ga[81]=0.00680
+ga[82]=0.00686
+ga[83]=0.00692
+ga[84]=0.00698
+ga[85]=0.00704
+ga[86]=0.00710
+ga[87]=0.00716
+ga[88]=0.00722
+ga[89]=0.00728
+ga[90]=0.00734
+ga[91]=0.00740
+ga[92]=0.00746
+ga[93]=0.00752
+ga[94]=0.00758
+ga[95]=0.00764
+ga[96]=0.00770
+ga[97]=0.00776
+ga[98]=0.00782
+ga[99]=0.00788
+ga[100]=0.00794
+ga[101]=0.00800
+
+
+for i in ${Listoffiles}
+do
+chemfiletemp="$(echo ${i}|cut -d'_' -f2)"
+chemfile="chem.inp_$chemfiletemp"
+for j in $(jot ${amountga} 1) #from j=1 to j=9
+do
+nrga="$(printf "%3.3d" $j)"
+
+#j="$(echo ${i}|cut -d'.' -f2)"
+cp $i ${i}ga$nrga
+#cp $chemfile ${chemfile}ga$nrga
+echo ${i}ga$nrga
+sed -i '.saved' 30s/"0.008"/"${ga[$j]}"/1 ${i}ga$nrga  #sed will replace at line number 27
+							   #ga original value 286. by a new value (looped)
+							   #in gae file namoptions_ga00X (looped)
+							   #it will also save a backup file "namoptions_ga00X.saved"
+sed -i '.saved' 4s/"SENS_"/"SENS_ga$nrga"/1 ${i}ga$nrga
+rm -f *saved
+done
+done

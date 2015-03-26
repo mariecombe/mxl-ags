@@ -1,0 +1,135 @@
+#!/bin/bash
+# this script will produce one namoptions file for each of the values we want to try for the sensitivity analysis of wg
+
+#rm namoptions_w*
+#rm chem.inp_w*
+
+Listoffiles="namoptions_*"
+amountwg=101 #101
+
+# this file contains 101 values for wg and w2 between smi=0.4 and smi=0.6
+# wg = numpy.arange(0.096,0.11410,0.00018)
+
+wg[1]=0.0960
+wg[2]=0.0962
+wg[3]=0.0964
+wg[4]=0.0965
+wg[5]=0.0967
+wg[6]=0.0969
+wg[7]=0.0971
+wg[8]=0.0973
+wg[9]=0.0974
+wg[10]=0.0976
+wg[11]=0.0978
+wg[12]=0.0980
+wg[13]=0.0982
+wg[14]=0.0983
+wg[15]=0.0985
+wg[16]=0.0987
+wg[17]=0.0989
+wg[18]=0.0991
+wg[19]=0.0992
+wg[20]=0.0994
+wg[21]=0.0996
+wg[22]=0.0998
+wg[23]=0.1000
+wg[24]=0.1001
+wg[25]=0.1003
+wg[26]=0.1005
+wg[27]=0.1007
+wg[28]=0.1009
+wg[29]=0.1010
+wg[30]=0.1012
+wg[31]=0.1014
+wg[32]=0.1016
+wg[33]=0.1018
+wg[34]=0.1019
+wg[35]=0.1021
+wg[36]=0.1023
+wg[37]=0.1025
+wg[38]=0.1027
+wg[39]=0.1028
+wg[40]=0.1030
+wg[41]=0.1032
+wg[42]=0.1034
+wg[43]=0.1036
+wg[44]=0.1037
+wg[45]=0.1039
+wg[46]=0.1041
+wg[47]=0.1043
+wg[48]=0.1045
+wg[49]=0.1046
+wg[50]=0.1048
+wg[51]=0.1050
+wg[52]=0.1052
+wg[53]=0.1054
+wg[54]=0.1055
+wg[55]=0.1057
+wg[56]=0.1059
+wg[57]=0.1061
+wg[58]=0.1063
+wg[59]=0.1064
+wg[60]=0.1066
+wg[61]=0.1068
+wg[62]=0.1070
+wg[63]=0.1072
+wg[64]=0.1073
+wg[65]=0.1075
+wg[66]=0.1077
+wg[67]=0.1079
+wg[68]=0.1081
+wg[69]=0.1082
+wg[70]=0.1084
+wg[71]=0.1086
+wg[72]=0.1088
+wg[73]=0.1090
+wg[74]=0.1091
+wg[75]=0.1093
+wg[76]=0.1095
+wg[77]=0.1097
+wg[78]=0.1099
+wg[79]=0.1100
+wg[80]=0.1102
+wg[81]=0.1104
+wg[82]=0.1106
+wg[83]=0.1108
+wg[84]=0.1109
+wg[85]=0.1111
+wg[86]=0.1113
+wg[87]=0.1115
+wg[88]=0.1117
+wg[89]=0.1118
+wg[90]=0.1120
+wg[91]=0.1122
+wg[92]=0.1124
+wg[93]=0.1126
+wg[94]=0.1127
+wg[95]=0.1129
+wg[96]=0.1131
+wg[97]=0.1133
+wg[98]=0.1135
+wg[99]=0.1136
+wg[100]=0.1138
+wg[101]=0.1140
+
+for i in ${Listoffiles}
+do
+chemfiletemp="$(echo ${i}|cut -d'_' -f2)"
+chemfile="chem.inp_$chemfiletemp"
+for j in $(jot ${amountwg} 1) #from j=1 to j=9
+do
+nrwg="$(printf "%3.3d" $j)"
+
+#j="$(echo ${i}|cut -d'.' -f2)"
+cp $i ${i}wg$nrwg
+#cp $chemfile ${chemfile}wg$nrwg
+echo ${i}wg$nrwg
+sed -i '.saved' 123s/"0.11"/"${wg[$j]}"/1 ${i}wg$nrwg  
+sed -i '.saved' 124s/"0.11"/"${wg[$j]}"/1 ${i}wg$nrwg  #sed will replace at line number 27
+							   #wge original value 286. by a new value (looped)
+							   #in wge file namoptions_wg00X (looped)
+							   #it will also save a backup file "namoptions_wg00X.saved"
+sed -i '.saved' 4s/"OBS04AUG2007"/"SENS_wg$nrwg"/1 ${i}wg$nrwg
+rm -f *saved
+done
+done

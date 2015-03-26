@@ -1,0 +1,129 @@
+#!/bin/bash
+# this script will produce one namoptions file for each of the values we want to try for the sensitivity analysis of qm0
+
+#rm namoptions_w*
+#rm chem.inp_w*
+
+Listoffiles="namoptions_*"
+amountqm=101
+qm[1]=6.00
+qm[2]=6.08
+qm[3]=6.16
+qm[4]=6.24
+qm[5]=6.32
+qm[6]=6.40
+qm[7]=6.48
+qm[8]=6.56
+qm[9]=6.64
+qm[10]=6.72
+qm[11]=6.80
+qm[12]=6.88
+qm[13]=6.96
+qm[14]=7.04
+qm[15]=7.12
+qm[16]=7.20
+qm[17]=7.28
+qm[18]=7.36
+qm[19]=7.44
+qm[20]=7.52
+qm[21]=7.60
+qm[22]=7.68
+qm[23]=7.76
+qm[24]=7.84
+qm[25]=7.92
+qm[26]=8.00
+qm[27]=8.08
+qm[28]=8.16
+qm[29]=8.24
+qm[30]=8.32
+qm[31]=8.40
+qm[32]=8.48
+qm[33]=8.56
+qm[34]=8.64
+qm[35]=8.72
+qm[36]=8.80
+qm[37]=8.88
+qm[38]=8.96
+qm[39]=9.04
+qm[40]=9.12
+qm[41]=9.20
+qm[42]=9.28
+qm[43]=9.36
+qm[44]=9.44
+qm[45]=9.52
+qm[46]=9.60
+qm[47]=9.68
+qm[48]=9.76
+qm[49]=9.84
+qm[50]=9.92
+qm[51]=10.00
+qm[52]=10.08
+qm[53]=10.16
+qm[54]=10.24
+qm[55]=10.32
+qm[56]=10.40
+qm[57]=10.48
+qm[58]=10.56
+qm[59]=10.64
+qm[60]=10.72
+qm[61]=10.80
+qm[62]=10.88
+qm[63]=10.96
+qm[64]=11.04
+qm[65]=11.12
+qm[66]=11.20
+qm[67]=11.28
+qm[68]=11.36
+qm[69]=11.44
+qm[70]=11.52
+qm[71]=11.60
+qm[72]=11.68
+qm[73]=11.76
+qm[74]=11.84
+qm[75]=11.92
+qm[76]=12.00
+qm[77]=12.08
+qm[78]=12.16
+qm[79]=12.24
+qm[80]=12.32
+qm[81]=12.40
+qm[82]=12.48
+qm[83]=12.56
+qm[84]=12.64
+qm[85]=12.72
+qm[86]=12.80
+qm[87]=12.88
+qm[88]=12.96
+qm[89]=13.04
+qm[90]=13.12
+qm[91]=13.20
+qm[92]=13.28
+qm[93]=13.36
+qm[94]=13.44
+qm[95]=13.52
+qm[96]=13.60
+qm[97]=13.68
+qm[98]=13.76
+qm[99]=13.84
+qm[100]=13.92
+qm[101]=14.00
+
+
+for i in ${Listoffiles}
+do
+chemfiletemp="$(echo ${i}|cut -d'_' -f2)"
+chemfile="chem.inp_$chemfiletemp"
+for j in $(jot ${amountqm} 1) #from j=1 to j=9
+do
+nrqm="$(printf "%3.3d" $j)"
+
+cp $i ${i}qm$nrqm
+echo ${i}qm$nrqm
+sed -i '.saved' 42s/"8.5"/"${qm[$j]}"/1 ${i}qm$nrqm  #sed will replace at line number 27
+							   #qm original value 286. by a new value (looped)
+							   #in qme file namoptions_qm00X (looped)
+							   #it will also save a backup file "namoptions_qm00X.saved"
+sed -i '.saved' 4s/"OBS04AUG2007"/"SENS_qm$nrqm"/1 ${i}qm$nrqm
+rm -f *saved
+done
+done
