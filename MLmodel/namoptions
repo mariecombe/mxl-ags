@@ -1,0 +1,199 @@
+!#################
+&NAMRUN
+!#################
+outdir     = 'OBS04AUG2007'
+atime      = 60     !some time variable used for output, see .f90 file
+atime_vert = 1800   !some time variable used for output, see .f90 file
+!------------------ Basic features of CLASS: -----------------
+time       = 43200  !runtime [s], here equivalent to t=12h in CLASS
+dtime      = 60     !time-step [s]
+!----------------- Rad/Geo features of CLASS: ----------------
+latt       = 51.59
+long       = 5.38
+day        = 216    !DOY: originally 268
+hour       = 6.     !time of  computation start [h_UTC]
+!------------ !! Source code features of CLASS: !! -----------
+h_max      = 3000   !maximum BL height
+/
+
+!#################
+&NAMDYN
+!#################
+!------------------ Basic features of CLASS: -----------------
+zi0        = 230.0    !BL initial height [m], same as h0 in CLASS
+pressure   = 1022.0   !pressure [hPa]
+wsls       = 0.000007 !large-scale divergence [s-1], same as div in CLASS
+beta       = 0.20     !entrainment ratio
+thetam0    = 286.     !initial mixed-layer potential temperature [K]
+dtheta0    = 5.       !initial mixed-layer potential temperature jump at top of BL [K]
+
+gamma      = 0.008    !free troposphere potential temperature lapse rate [K.m-1]
+gammatim   = 24.      !time UTC after which we switch from gamma to gammabis
+gammabis   = 0.000
+
+advtheta   = 0.0003   !advection of heat [K.s-1]
+advthetatim = 10.
+advthetabis = 0.0000      
+advthetatim2 = 14.
+advthetater = 0.
+
+wthetasmax = 0.09     !used to prescribe theta flux if land-surface off, see NAMFLUX and c_wth
+
+qm0        = 8.5      !initial mixed-layer specific humidity [g.Kg-1]
+dq0        = -1.      !initial mixed-layer specific humidity jump at top of BL [g.Kg-1]
+gammaq     = -0.0005  !free troposphere specific humidity lapse rate [g.Kg-1.m-1]
+
+advq       = 0.00035  !advection of moisture [g.Kg-1.s-1]
+advqtim    = 7.5           
+advqbis    = 0.000       
+
+wqsmax     = 0.08    !used to prescribe q flux if land surface off, see NAMFLUX and c_wth
+c_wth      = .false. !constant surface fluxes switch, used if land-surface is off
+                     !if false, equivalent of unticking the "diurnal cycle" boxes in CLASS
+!------------------ Wind features of CLASS: ------------------
+c_ustr     = .false. !constant ustar switch, can be used if land surface off
+uws0       = 0.5     !used if c_ustr=.true. to calculate ustar
+vws0       = 0.5     !used if c_ustr=.true. to calculate ustar
+um0        = 5       !initial mixed-layer u-wind speed [m.s-1]
+ug         = 8.      !geostrophic u-wind speed [m.s-1]
+gammau     = 0.      !free troposphere u-wind speed lapse rate [s-1]
+vm0        = 0.      !initial mixed-layer v-wind speed [m.s-1]
+vg         = 0.      !geostrophic u-wind speed [m.s-1]
+gammav     = 0       !free troposphere v-wind speed lapse rate [s-1]
+cm0        = 422000. !initial mixed-layer CO2 mixing ratio [ppb]
+dc0        = -50000. !initial mixed-layer CO2 mixing ratio jump at top of BL [ppb]
+gammac     = -10.     !free troposphere CO2 mixing ratio lapse rate [ppb.m-1]
+wcsmax     = 0.67    !used to prescribe c flux if land-surface off
+!--------------- Source code features of CLASS: --------------
+z0         = 0.1     !value ok for short crops like wheat, few obstacles. 
+                     !z0 is overwritten with NAMSURF values of z0m and z0h if are provided
+ladvecFT   = .false. !advection in free troposphere?
+lscu       = .true.
+/
+
+!#################
+&NAMRAD
+!#################
+!----------------- Rad/Geo features of CLASS: ----------------
+lradiation   = .true.
+cc           = 0.225  !cloud cover fraction [-]
+!------------ Advanced surface features of CLASS: ------------
+albedo       = 0.198  !Surface albedo
+!------------ !! Source code features of CLASS: !! -----------
+S0           = 1368. !Incoming radiation at top of atmosphere
+/
+
+!#################
+&NAMSURFLAYER
+!#################
+!---------------- Surface features of CLASS: -----------------
+lsurfacelayer = .true. !set to true if land-surface on
+z0m          = 0.15  !roughness length for momentum [m]
+z0h          = 0.015 !roughness length for scalars [m]
+/
+
+!#################
+&NAMFLUX             !used if land-surface off: prescribed sfc fluxes
+!#################
+!---------- Basic & Source code features of CLASS: -----------
+starttime_wt = 0
+endtime_wt   = 37800 !equivalent to Tdiurnal=12h in CLASS
+offset_wt    = 0
+function_wt  = 2     !see function choice in .f90 file 
+                     !might have to activate diurnal cycle of temperature in CLASS
+
+starttime_wq = -7200
+endtime_wq   = 43200 !equivalent to Tdiurnal=12h in CLASS
+offset_wq    = 0.0
+function_wq  = 2     !see function choice in .f90 file 
+                     !might have to activate diurnal cycle of temperature in CLASS
+/
+
+!#################
+&NAMSURFACE
+!#################
+!---------------- Surface features of CLASS: -----------------
+llandsurface = .true.
+lrsAgs     =.true.   !Switch to use A-gs model for surface resistances
+lCO2Ags    =.true.   !Switch to use A-gs model for CO2 flux
+Ts         = 290.00  !Initial surface temperature [K]
+Wl         = 0.000     !Equivalent water layer depth for wet vegetation
+Tsoil      = 288.    !Temperature top soil layer
+T2         = 289.    !Temperature deeper soil layer
+w2         = 0.11    !0.11 !Volumetric water content deeper soil layer
+wg         = 0.11    !0.11 !Volumetric water content top soil layer
+betawfunc  = 'exponential'
+P4         = 0.000001
+stressplace = 'Ag' 
+!----------------- Rad/Geo features of CLASS: ----------------
+Qtot       = 400.0   !Incoming energy
+!------------ Advanced surface features of CLASS: ------------
+LAI        = 3.5      !Leaf area index
+gD         = 0.      !VPD correction factor for rs
+rsmin      = 180.    !40.     !Minimum resistance of transpiration
+cveg       = 0.97     !Vegetation fraction
+Lambda     = 2.5   !5.9     !Thermal diffusivity skin layer
+wsat       = 0.36    !0.60    !Saturated volumetric water content ECMWF config
+wfc        = 0.15    !0.491   !Volumetric water content field capacity
+wwilt      = 0.06    !0.314   !wilting point
+C1sat      = 0.132   !0.342   !Coefficient force term moisture
+C2ref      = 1.8     !0.3     !Coefficient restore term moisture
+CLa        = 0.219   !0.083   !Clapp and Hornberger retention curve parameter a
+CLb        = 4.9     !11.4    !Clapp and Hornberger retention curve parameter b
+CLc        = 4.      !12.     !Clapp and Hornberger retention curve parameter c
+CGsat      = 3.56E-6 !3.6E-6 !Saturated soil conductivity for heat
+!------------ !! Source code features of CLASS: !! -----------
+rssoilmin  = 50.     !Minimum resistance of soil transpiration
+!------------- Plant physiology -----------------------------
+! values for C3/C4 are from Ronda et al. 2001, Representation of the canopy conductance in modeling the surface energy budget for low vegetation
+! values in parenthesis are from Jacobs et al. 1997, Predicting Regional Transpiration at Elevated Atmospheric CO2 (…)
+
+CO2comp298 = 4.3     !CO2 compensation concentration at 298 K (25 degC) [mg m-3]       ! 68.5 for C3 plants, 4.3 for C4 plants
+Q10CO2     = 1.5     ! Q10=1.5 <==> 50% increase in "CO2comp at 298 K" with +10 K
+
+gm298      = 17.5    !mesophyll conductance at 298 K (25 degC) [mm s-1]                ! 7. for C3 plants, 17.5 for C4 plants
+Q10gm      = 2.      ! Q10=2.0 <==> 100% increase in "gm at 298 K" with +10 K
+T1gm       = 286.    !reference temperature T1 for mesophyll conductance gm [K]        ! 278. for C3 plants, 286. for C4 plants
+T2gm       = 309.    !reference temperature T2 for mesophyll conductance gm [K]        ! 301. for C3 plants, 309. for C4 plants
+
+Ammax298   = 1.7     !CO2 maximal primary productivity [mg m-2 s-1]                    ! 2.2 for C3 plants, 1.7 for C4 plants
+Q10Am      = 2.      ! Q10=2.0 <==> 100% increase in "Ammax at 298 K" with +10 K
+T1Am       = 286.    !reference temperature T1 for Ammax [K]                           ! 281. for C3 plants, 286. for C4 plants
+T2Am       = 311.    !reference temperature T1 for Ammax [K]                         
+
+f0         = 0.85    !maximum value Cfrac [-]                                          ! 0.89 for C3 plants, 0.85 for C4 plants 
+ad         = 0.15    !regression coefficient to calculate Cfrac [kPa-1]                ! 0.07 for C3 plants, 0.15 for C4 plants
+alpha0     = 0.014   !initial low light conditions [mg J-1]                            ! 0.017 for C3 plants, 0.014 for C4 plants
+Kx         = 0.7     !extinction coefficient PAR [-]
+gmin       = 2.5E-4  !cuticular (minimum) conductance [m s-1]
+!------------- soil respiration model -----------------------
+Cw         = 1.6E-3  !constant water stress correction (eq. 13 Jacobs et al. 2007) [-]
+wsmax      = 0.55    !upper reference value soil water [-]
+wsmin      = 0.005   !lower reference value soil water [-]
+R10        = 0.03    !==1.56 micromoles CO2/m2/s as R10 soil respiration in Jacobs et al. 2010    !respiration at 10 C [mg CO2 m-2 s-1]
+Eact0      = 53.3E3  !activation energy [53.3 kJ kmol-1]
+/
+
+!#################
+&NAMCROP
+!#################
+lcrop = .false.  ! switch to calculate the crop-specific variables
+SLP   = 1.      ! type of crop: short-day (=1.) or long-day (=-1.) crop
+DS0   = 1.1     ! initial developmental stage [-] (range from 0. to 2.)
+TBD   = 8.      ! base temperature for phenology [degC]
+TOD   = 30.     ! optimal temperature for phenology [degC]
+TCD   = 42.     ! ceiling temperature for phenology [degC]
+TSEN  = 1.      ! curvature of the temperature response [-] (range from 0.5 to 3.)
+SPSP  = 0.2     ! development stage at start of photosensitive period [-] (range from 0. to 0.5)
+EPSP  = 0.7     ! development stage at end of photosensitive period [-] (range from 0.5 to 0.8)
+PSEN  = 0.      ! photoperiod sensitivity of phenological development [h-1]
+MTDV  = 41.     ! minimal thermal days for vegetative phase [d]
+MTDR  = 15.7    ! minimal thermal days for reproductive phase [d]
+/
+
+!#################
+&NAMCHEM
+!#################
+!---------------- Species features of CLASS: ----------------
+lchem = .false.
+/

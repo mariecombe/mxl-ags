@@ -1,0 +1,131 @@
+#!/bin/bash
+# this script will produce one namoptions file for each of the values we want to try for the sensitivity analysis of demmaq
+
+#rm namoptions_w*
+#rm chem.inp_w*
+
+Listoffiles="namoptions_*"
+amountde=101
+de[1]=0.500
+de[2]=0.545
+de[3]=0.590
+de[4]=0.635
+de[5]=0.680
+de[6]=0.725
+de[7]=0.770
+de[8]=0.815
+de[9]=0.860
+de[10]=0.905
+de[11]=0.950
+de[12]=0.995
+de[13]=1.040
+de[14]=1.085
+de[15]=1.130
+de[16]=1.175
+de[17]=1.220
+de[18]=1.265
+de[19]=1.310
+de[20]=1.355
+de[21]=1.400
+de[22]=1.445
+de[23]=1.490
+de[24]=1.535
+de[25]=1.580
+de[26]=1.625
+de[27]=1.670
+de[28]=1.715
+de[29]=1.760
+de[30]=1.805
+de[31]=1.850
+de[32]=1.895
+de[33]=1.940
+de[34]=1.985
+de[35]=2.030
+de[36]=2.075
+de[37]=2.120
+de[38]=2.165
+de[39]=2.210
+de[40]=2.255
+de[41]=2.300
+de[42]=2.345
+de[43]=2.390
+de[44]=2.435
+de[45]=2.480
+de[46]=2.525
+de[47]=2.570
+de[48]=2.615
+de[49]=2.660
+de[50]=2.705
+de[51]=2.750
+de[52]=2.795
+de[53]=2.840
+de[54]=2.885
+de[55]=2.930
+de[56]=2.975
+de[57]=3.020
+de[58]=3.065
+de[59]=3.110
+de[60]=3.155
+de[61]=3.200
+de[62]=3.245
+de[63]=3.290
+de[64]=3.335
+de[65]=3.380
+de[66]=3.425
+de[67]=3.470
+de[68]=3.515
+de[69]=3.560
+de[70]=3.605
+de[71]=3.650
+de[72]=3.695
+de[73]=3.740
+de[74]=3.785
+de[75]=3.830
+de[76]=3.875
+de[77]=3.920
+de[78]=3.965
+de[79]=4.010
+de[80]=4.055
+de[81]=4.100
+de[82]=4.145
+de[83]=4.190
+de[84]=4.235
+de[85]=4.280
+de[86]=4.325
+de[87]=4.370
+de[88]=4.415
+de[89]=4.460
+de[90]=4.505
+de[91]=4.550
+de[92]=4.595
+de[93]=4.640
+de[94]=4.685
+de[95]=4.730
+de[96]=4.775
+de[97]=4.820
+de[98]=4.865
+de[99]=4.910
+de[100]=4.955
+de[101]=5.000
+
+
+for i in ${Listoffiles}
+do
+chemfiletemp="$(echo ${i}|cut -d'_' -f2)"
+chemfile="chem.inp_$chemfiletemp"
+for j in $(jot ${amountde} 1) #from j=1 to j=9
+do
+nrde="$(printf "%3.3d" $j)"
+
+#j="$(echo ${i}|cut -d'.' -f2)"
+cp $i ${i}de$nrde
+#cp $chemfile ${chemfile}de$nrde
+echo ${i}de$nrde
+sed -i '.saved' 28s/"5."/"${de[$j]}"/1 ${i}de$nrde  #sed will replace at line number 27
+							   #de original value 286. by a new value (looped)
+							   #in dee file namoptions_de00X (looped)
+							   #it will also save a backup file "namoptions_de00X.saved"
+sed -i '.saved' 4s/"OBS04AUG2007"/"SENS_de$nrde"/1 ${i}de$nrde
+rm -f *saved
+done
+done
