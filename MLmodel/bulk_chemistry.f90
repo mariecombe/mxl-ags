@@ -1203,11 +1203,11 @@ implicit none
         Tsoiltend = CG * GR - 2.0 * pi / 86400.0 * (Tsoil - T2)
         Tsoil  = Tsoil + Tsoiltend * dtime
 
-        C1     = C1sat * (wsat / wg) ** (CLb / 2.0 + 1.0)
+        C1     = C1sat * (wsat / w2) ** (CLb / 2.0 + 1.0)
         C2     = C2ref * (w2 / (wsat - w2) )
         wgeq   = w2 - wsat * CLa * ( (w2 / wsat) ** CLc * (1.0 - (w2 / wsat) ** (8.0 * CLc)) )
 
-        wgtend = - C1 / (rhow * 0.1) * LEsoil / Lv - C2 / 86400 * (wg - wgeq)
+        wgtend = - C1 / (rhow * 0.1) * LEsoil / Lv - C2 / 86400 * (w2 - wgeq)
         wg     = wg + wgtend * dtime
 
 
