@@ -141,7 +141,7 @@ implicit none
   double precision :: wsat=0.6,CLa=0.083, CLb=11.4, CLc=12.0, C1sat=0.342, C2ref=0.3
   double precision :: wg=0.40,rssoilmin=0,cliq,Wlmx,Wl=0.0,Wmax=2.0e-4,cveg=1.0
   double precision :: Lambda = 5.9, Tsoil=285, T2=285, Tsoiltend, Wltend, CGsat=3.6e-6
-  double precision :: LEveg, LEliq, LEsoil, LE, SH, GR=0.0, CG, wgtend
+  double precision :: LEveg, LEliq, LEsoil, LE, SH, GR=0.0, CG, wgtend, w2tend
 
   double precision qm(2), dq(2),wqe
   double precision :: betaq,wqs=0,gammaq = 0.0 ,qm0 = 0.0,dq0 =0.0
@@ -1067,13 +1067,13 @@ implicit none
 	  ! Updated code by Marie on 20 March 2014: implementation of different water stress functions
           select case(betawfunc)
 	      case("exponential")
-	          betaw    = max(1.0e-3,min(1.0, (( 1.- exp(-P4*(wg - wwilt)/(wfc - wwilt)) )/( 1.- exp(-P4) )) ))
+	          betaw    = max(1.0e-3,min(1.0, (( 1.- exp(-P4*(w2 - wwilt)/(wfc - wwilt)) )/( 1.- exp(-P4) )) ))
 	      case("quadratic")
-                  betaw    = max(1.0e-3,min(1.0, (2.*(wg - wwilt)/(wfc - wwilt) - ((wg - wwilt)/(wfc - wwilt))**2.)))
+                  betaw    = max(1.0e-3,min(1.0, (2.*(w2 - wwilt)/(wfc - wwilt) - ((w2 - wwilt)/(wfc - wwilt))**2.)))
 	      case("linear")
-	          betaw    = max(1.0e-3,min(1.0,(wg - wwilt)/(wfc - wwilt)))
+	          betaw    = max(1.0e-3,min(1.0,(w2 - wwilt)/(wfc - wwilt)))
 	      case default
-	          betaw    = max(1.0e-3,min(1.0,(wg - wwilt)/(wfc - wwilt)))
+	          betaw    = max(1.0e-3,min(1.0,(w2 - wwilt)/(wfc - wwilt)))
           end select	  
 	      
           ! implement the water stress in the code: either on Ag or gm.
@@ -1209,6 +1209,10 @@ implicit none
 
         wgtend = - C1 / (rhow * 0.1) * LEsoil / Lv - C2 / 86400 * (w2 - wgeq)
         wg     = wg + wgtend * dtime
+
+        ! Added by Marie on 1 April 2015: equations for internal calculation of w2
+        w2tend = - 1.0 / (rhow * 1.5) * LEveg / Lv 
+        w2     = w2 + w2tend * dtime
 
 
         ! kinematic fluxes
