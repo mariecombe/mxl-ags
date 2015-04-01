@@ -26,12 +26,14 @@ all:
 	make ${OBJECTS}
 	make expanded_MXL.exe
 	@echo ' '
+	/bin/rm -f *.mod *.o
 
 allnrun: 
 	make clean
 	make ${OBJECTS}
 	make expanded_MXL.exe
 	@echo ' '
+	/bin/rm -f *.mod *.o
 	./expanded_MXL.exe
 
 modchem.o  : modchem.f90
