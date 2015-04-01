@@ -756,13 +756,13 @@ implicit none
   open (60, file=trim(outdir)//dirsep//'output_sca')
     !write (60,'(a4)') 'TIMS'
     !write (60,'(I4)') time/atime
-    write (60,'(53a25)') 'UTC(hours)','RT(hours)','zi(m)', &
+    write (60,'(54a25)') 'UTC(hours)','RT(hours)','zi(m)', &
             'qm(g.kg-1)','dq(g.kg-1)','wqe','wqs','betaq','thetasurf(K)','cq(-)','qsatsurf(g.kg-1)','qsurf(g.kg-1)','q2m(g.kg-1)', &
             'e2m(kPa)','qsatTs(g.kg-1)', &
             'cm(ppm)','dc(ppm)', 'wce(ppm.m.s-1)','wcs(ppm.m.s-1)','dwcs_dh(ppm.s-1)','dwce_dh(ppm.s-1)','betac', &
 	    'rs(s.m-1)','rsco2(s.m-1)','ra(s.m-1)','rssoil(s.m-1)','gmesophyl', &
             'Resp(mgCO2.m-2.s-1)','Ammax','Am(mgCO2.m-2.s-1)','scaleAg_star(-)', 'Ag_star(mgCO2.m-2.s-1)','betaw(-)','An(mgCO2.m-2.s-1)', 'dAn_dh(ppm)','dResp_dh(ppm)', &
-            'pressure','Ds','Dstar','Cfrac','ci(ppm)','CO2comp(ppm)','gcco2(s.m-1)','wg(cm3.cm-3)','Tcanopy-Tair(degC)','Cair-Ci(ppm)','VPD(g.kg-1)',&
+            'pressure','Ds','Dstar','Cfrac','ci(ppm)','CO2comp(ppm)','gcco2(s.m-1)','wg(cm3.cm-3)','w2(cm3.cm-3)','Tcanopy-Tair(degC)','Cair-Ci(ppm)','VPD(g.kg-1)',&
 	    'wce(mgCO2.m-2.s-1)','AnSUM(gCO2.m-2)','dwcs_dh_sum(ppm)','dwce_dh_sum(ppm)', 'DTU(-)', 'DVR(d-1)'
 
   open (61, file=trim(outdir)//dirsep//'MXL_resistances')
@@ -1203,11 +1203,11 @@ implicit none
         Tsoiltend = CG * GR - 2.0 * pi / 86400.0 * (Tsoil - T2)
         Tsoil  = Tsoil + Tsoiltend * dtime
 
-        C1     = C1sat * (wsat / w2) ** (CLb / 2.0 + 1.0)
+        C1     = C1sat * (wsat / wg) ** (CLb / 2.0 + 1.0)
         C2     = C2ref * (w2 / (wsat - w2) )
         wgeq   = w2 - wsat * CLa * ( (w2 / wsat) ** CLc * (1.0 - (w2 / wsat) ** (8.0 * CLc)) )
 
-        wgtend = - C1 / (rhow * 0.1) * LEsoil / Lv - C2 / 86400 * (w2 - wgeq)
+        wgtend = - C1 / (rhow * 0.1) * LEsoil / Lv - C2 / 86400 * (wg - wgeq)
         wg     = wg + wgtend * dtime
 
         ! Added by Marie on 1 April 2015: equations for internal calculation of w2
@@ -1791,12 +1791,12 @@ implicit none
         ustar,uws, vws, uwe, vwe, du(2), dv(2), &
         sqrt(du(2)**2+dv(2)**2)
 
-      write (60,'(2F25.12,51E25.4)') thour,printhour, zi(2), &
+      write (60,'(2F25.12,52E25.4)') thour,printhour, zi(2), &
         qm(2), dq(2), wqe, wqs, betaq, thetasurf, cq, qsatsurf, qsurf, q2m, e2m/1000., qsatTs*1000., &
         cm(2)/1000., dc(2)/1000., wce/1000., wcs/1000., ((1/(zi(1)+inf))*(wcs/1000.)), ((1/(zi(1)+inf))*(- wce/1000.)), betac, &
         rs, rsCO2, ra, rssoil, gm,Resp, Ammax, Am, (1 - 1.0 / (Kx * LAI) * (E1( tempy * exp(-Kx * LAI)) - E1(tempy))), LAI*Ag_star, betaw, An, &
 	((1/(zi(1)+inf))*An*(MW_Air/MW_CO2)*(1./rho))*dtime, ((1/(zi(1)+inf))*Resp*(MW_Air/MW_CO2)*(1./rho))*dtime, &
-	pressure, Ds, Dstar, cfrac, ci_ppm, CO2comp * (MW_Air/MW_CO2) * (1./rho), gcco2, wg, &
+	pressure, Ds, Dstar, cfrac, ci_ppm, CO2comp * (MW_Air/MW_CO2) * (1./rho), gcco2, wg, w2, &
         Ts-thetam(1), CO2ags-ci_ppm, qsatTs*1000.-qm(1), &
         wce/1000. * (MW_CO2/MW_Air) * rho, &     !wce is in ppbv.m.s-1 in the code, so wce[kgco2.m-2.s-1] = rho*Mco2/Mair *10-6* wce/1000. and wce[mgco2.m-2.s-1] = rho*Mco2/Mair *wce/1000.
         NEEsum*time/1000., dwcs_dh_sum, dwce_dh_sum, DTU, DVR
