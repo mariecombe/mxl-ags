@@ -1211,7 +1211,7 @@ implicit none
         wg     = wg + wgtend * dtime
 
         ! Added by Marie on 1 April 2015: equations for internal calculation of w2
-        w2tend = - 1.0 / (rhow * 1.5) * LEveg / Lv + C2 / 86400 * (wg - wgeq) * 0.1/1.5
+        w2tend = - 1.0 / (rhow * 1.5) * LEveg / Lv !!+ C2 / 86400 * (wg - wgeq) * 0.1/1.5
         w2     = w2 + w2tend * dtime
 
 
