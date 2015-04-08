@@ -1067,13 +1067,13 @@ implicit none
 	  ! Updated code by Marie on 20 March 2014: implementation of different water stress functions
           select case(betawfunc)
 	      case("exponential")
-	          betaw    = max(1.0e-3,min(1.0, (( 1.- exp(-P4*(w2 - wwilt)/(wfc - wwilt)) )/( 1.- exp(-P4) )) ))
+	          betaw    = max(0.,min(1.0, (( 1.- exp(-P4*(w2 - wwilt)/(wfc - wwilt)) )/( 1.- exp(-P4) )) ))
 	      case("quadratic")
-                  betaw    = max(1.0e-3,min(1.0, (2.*(w2 - wwilt)/(wfc - wwilt) - ((w2 - wwilt)/(wfc - wwilt))**2.)))
+                  betaw    = max(0.,min(1.0, (2.*(w2 - wwilt)/(wfc - wwilt) - ((w2 - wwilt)/(wfc - wwilt))**2.)))
 	      case("linear")
-	          betaw    = max(1.0e-3,min(1.0,(w2 - wwilt)/(wfc - wwilt)))
+	          betaw    = max(0.,min(1.0,(w2 - wwilt)/(wfc - wwilt)))
 	      case default
-	          betaw    = max(1.0e-3,min(1.0,(w2 - wwilt)/(wfc - wwilt)))
+	          betaw    = max(0.,min(1.0,(w2 - wwilt)/(wfc - wwilt)))
           end select	  
 	      
           ! implement the water stress in the code: either on Ag or gm.
@@ -1211,7 +1211,7 @@ implicit none
         wg     = wg + wgtend * dtime
 
         ! Added by Marie on 1 April 2015: equations for internal calculation of w2
-        w2tend = - 1.0 / (rhow * 1.5) * LEveg / Lv 
+        w2tend = - 1.0 / (rhow * 1.5) * LEveg / Lv + C2 / 86400 * (wg - wgeq) * 0.1/1.5
         w2     = w2 + w2tend * dtime
 
 
