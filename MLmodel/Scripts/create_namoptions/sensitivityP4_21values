@@ -1,0 +1,56 @@
+#!/bin/bash
+# this script will produce one namoptions file for each of the values we want to try for the sensitivity analysis of P4
+
+#rm namoptions_w*
+#rm chem.inp_w*
+
+# this file contains values of P4 manually defined:
+# 25 first values: linear increase of P4 from 0 to 1.6
+# 25 second values: linear increase of P4 from 1.6 to 3.5
+# last 51 values: P4=(2**x)-1 with x varying between 2.17 to 4 (P4 varying exponentially from 3.5 to 15)
+
+Listoffiles="namoptions_*"
+amountP4=21
+P4[1]=1.000e-06
+P4[2]=3.200e-01
+P4[3]=6.400e-01
+P4[4]=9.600e-01
+P4[5]=1.280e+00
+P4[6]=1.600e+00
+P4[7]=1.980e+00
+P4[8]=2.360e+00
+P4[9]=2.740e+00
+P4[10]=3.120e+00
+P4[11]=3.500e+00
+P4[12]=4.109e+00
+P4[13]=4.800e+00
+P4[14]=5.584e+00
+P4[15]=6.475e+00
+P4[16]=7.486e+00
+P4[17]=8.633e+00
+P4[18]=9.936e+00
+P4[19]=1.141e+01
+P4[20]=1.309e+01
+P4[21]=1.500e+01
+
+
+for i in ${Listoffiles}
+do
+chemfiletemp="$(echo ${i}|cut -d'_' -f2)"
+chemfile="chem.inp_$chemfiletemp"
+for j in $(jot ${amountP4} 1) #from j=1 to j=101
+do
+nrP4="$(printf "%3.3d" $j)"
+
+#j="$(echo ${i}|cut -d'.' -f2)"
+cp $i ${i}P4$nrP4
+#cp $chemfile ${chemfile}P4$nrP4
+echo ${i}P4$nrP4
+sed -i '.saved' 126s/"0.000001"/"${P4[$j]}"/1 ${i}P4$nrP4  #sed will replace at line number 27
+							   #P4e original value 286. by a new value (looped)
+							   #in P4e file namoptions_P400X (looped)
+							   #it will also save a backup file "namoptions_P400X.saved"
+sed -i '.saved' 4s/"OBS04AUG2007"/"SENS_P4$nrP4"/1 ${i}P4$nrP4
+rm -f *saved
+done
+done
