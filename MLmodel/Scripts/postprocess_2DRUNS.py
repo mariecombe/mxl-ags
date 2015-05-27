@@ -86,18 +86,31 @@ def sigmoid(x, slope):
     return y
     
 #----------------------------------------------------------------------
-def define_P4_range():
+def define_P4_range(number_values):
 
-    X = numpy.arange(2.17,4.01,0.0366)
+#    X = numpy.arange(2.17,4.01,0.0366)
+#    P3 = [0.]*len(X)
+#    for i,val in enumerate(X):
+#        P3[i] = (2.**val)-0.999999
+#    P0 = numpy.arange(0.000001,1.6,0.064)
+#    P1 = numpy.arange(1.6,3.5,0.076) 
+#    P4 = numpy.concatenate((P0,P1,P3), axis=0)   
+
+    import math
+    nb1 = math.ceil(float(number_values)/4.)
+    nb2 = math.ceil(float(number_values)/2.)
+
+    P0 = numpy.linspace(0.000001,1.6,nb1)
+    P0 = P0[0:len(P0)-1]
+    P1 = numpy.linspace(1.6,3.5,nb1)
+    P1 = P1[0:len(P1)-1]
+    X = numpy.linspace(2.17,4.0,nb2)
     P3 = [0.]*len(X)
     for i,val in enumerate(X):
         P3[i] = (2.**val)-0.999999
-    P0 = numpy.arange(0.000001,1.6,0.064)
-    P1 = numpy.arange(1.6,3.5,0.076) 
     P4 = numpy.concatenate((P0,P1,P3), axis=0)   
-    
-    return P4
 
+    return P4
 
 
 #######################################################################
@@ -120,7 +133,7 @@ if __name__ == "__main__":
     script executeRUNS (2-D sensitivity analysis execution script).
 
     You should call this script as:
-    > ./analyseSENS.py var1 var2 folder_path
+    > ./postprocess_2DRUNS.py var1 var2 folder_path
     where folder_path is the path to the 2-D sensitivity analysis output folder,
     var1 and var2 are your two tested drivers (see list of abbreviations in the
     script).
@@ -159,8 +172,10 @@ if __name__ == "__main__":
     drivers = {'wg'          : numpy.arange(0.06,0.1501,0.0009),
                'wg1'         : numpy.arange(0.096,0.1141,0.0006),
 	       'wg2'         : numpy.arange(0.096,0.11410,0.00018),
-	       'day'         : numpy.arange(130.,230.5,1.),
-	       'P4'          : define_P4_range(),
+	       #'day'         : numpy.arange(130.,230.5,1.),
+	       'day'         : numpy.arange(216.,237.,1.),
+	       'P4'          : define_P4_range(21),
+	       'deltatheta'  : numpy.arange(0.5,5.01,0.045),
 	       'gammatheta'  : numpy.arange(0.002,0.00806,0.00006), 
 	       'gammaq'      : numpy.arange(-0.005,0.00005,0.00005), 
 	       'thetam0'     : numpy.arange(284.,290.03,0.06),
@@ -182,7 +197,7 @@ if __name__ == "__main__":
 
     
     # list of namoptions files for sensitivity analysis
-    listofnamoptions = [f for f in os.listdir( analysisdir ) if ( f.startswith('nam') and (Var1[0:2] in f) and (Var2[0:2] in f) ) ]
+    listoffolders = [f for f in os.listdir( analysisdir ) if ( f.startswith('SENS_') and (Var1[0:2] in f) and (Var2[0:2] in f) ) ]
 
     
     # Create a summary output file - erase old file if exists
@@ -205,23 +220,24 @@ if __name__ == "__main__":
 
     # writing the header row
 
-    Results.write(             '%10s %10s        smi  curvature   Swin_max   SWin_int   Qnet_max   Qnet_int     LE_max     LE_int'\
+    Results.write(             '%10s %10s      smi_i  curvature   Swin_max   SWin_int   Qnet_max   Qnet_int     LE_max     LE_int'\
                   '  LEveg_max  LEveg_int LEsoil_max LEsoil_int  LEliq_max  LEliq_int     SH_max     SH_int     GR_max     GR_int'\
    ' evafra_ave        beta_ave     Ra_14h     Ra_ave          Rs_14h          Rs_ave   Anet_min   Resp_max    NEE_min    wce_min'\
    '   Anet_int   Resp_int    NEE_int    wce_int  wce_h_int  wcs_h_int    wce_wcs      WUEplt_ave      WUEeco_ave      WUEint_ave'\
    '      WUEplt_std      WUEeco_std      WUEint_std   tm_range     tm_max     qm_ave  co2_range    co2_min      h_max      h_ran'\
 		  '  lcl_h_min   wg_range     ts_max  wqe_h_int  wqs_h_int    wqe_wqs    wqe_int    VPD_ave     CD_ave   Anet_SUM'\
 		  '    DTU_SUM        DVR evafra_14h  SWnet_12h  SWnet_int    thetam0        lai       cveg     qm_18h    wts_int'\
-		  '    wte_int  wts_h_int  wte_h_int\n' %(Var1,Var2))
+		  '    wte_int  wts_h_int  wte_h_int   w2_range       wg_0       w2_0\n' %(Var1,Var2))
 
 
 ######################################
 
-    for i, tag in enumerate(listofnamoptions):
+    for i, tag in enumerate(listoffolders):
         # opening the results files
-        sensdir = 'SENS_'+tag[16:21]+tag[11:16] #the name of the SENS dir has var1 and var2 inverted compared to the namoptions file name
+        sensdir = tag 
         tag = tag[-11:]
         print tag
+
         Dummy = open_output(os.path.join(analysisdir,sensdir),['output_dyn','output_sca'])
 
         # New variables
@@ -275,7 +291,7 @@ if __name__ == "__main__":
 		    '%10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f '\
 		    '%10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f '\
 		    '%10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f '\
-		    '%10.5f %10.5f %10.5f\n'
+		    '%10.5f %10.5f %10.5f %10.5f %10.5f %10.5f\n'
                                 %(Var1val, Var2val, smi, step, Swin_max, Qnet_max, numpy.nan, numpy.nan, numpy.nan, numpy.nan,
 	         numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, 
 		 numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, 
@@ -283,10 +299,14 @@ if __name__ == "__main__":
 		 numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, 
 		 numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan,
 		 numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan,
-		 numpy.nan, numpy.nan, numpy.nan) )
+		 numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan, numpy.nan) )
         else:
 
-            # selecting data at 12 hUTC
+            # initial values:
+	    wg_i      = Dummy['output_sca']['wg(cm3.cm-3)'][0]
+	    w2_i      = Dummy['output_sca']['w2(cm3.cm-3)'][0]
+	    
+	    # selecting data at 12 hUTC
             ID_dyn_12 = numpy.where(Dummy['output_dyn']['UTC(hours)']==12.)[0][0]
             ID_sca_12 = numpy.where(Dummy['output_sca']['UTC(hours)']==12.)[0][0]
             ID_dyn_14 = numpy.where(Dummy['output_dyn']['UTC(hours)']==14.)[0][0]
@@ -352,6 +372,7 @@ if __name__ == "__main__":
  
             # ranges:
             wg_ran  = max(Dummy['output_sca']['wg(cm3.cm-3)']) -  min(Dummy['output_sca']['wg(cm3.cm-3)']) # gecros soil model or Ags soil model?
+	    w2_ran  = max(Dummy['output_sca']['w2(cm3.cm-3)']) -  min(Dummy['output_sca']['w2(cm3.cm-3)'])
             co2_ran = max(Dummy['output_sca']['cm(ppm)'])      -  min(Dummy['output_sca']['cm(ppm)'])
             tm_ran  = max(Dummy['output_dyn']['thetam(K)'])    -  min(Dummy['output_dyn']['thetam(K)'])
 	    h_ran   = max(Dummy['output_dyn']['zi(m)'])        -  min(Dummy['output_dyn']['zi(m)'])
@@ -440,9 +461,13 @@ if __name__ == "__main__":
 	    wce_wcs   = wce_h_int/wcs_h_int
 	    wqe_wqs   = wqe_h_int/wqs_h_int
 	    	    
-            # Other       
-            Var1val   = Range1[int(tag[3:6])-1]
-            Var2val   = Range2[int(tag[8:11])-1]
+            # Other   
+	    if Var1 == tag[1:3]:    
+                Var1val   = Range1[int(tag[3:6])-1]
+                Var2val   = Range2[int(tag[8:11])-1]
+	    else:
+                Var1val   = Range2[int(tag[3:6])-1]
+                Var2val   = Range1[int(tag[8:11])-1]
 
             if (Var1.startswith('wg')): 
                 smi   = (Var1val-0.06)/(0.15-0.06)
@@ -482,7 +507,7 @@ if __name__ == "__main__":
 		    '%15.5f %15.5f %15.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f '\
 		    '%10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f '\
 		    '%10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f %10.5f '\
-		    '%10.5f %10.5f %10.5f\n'
+		    '%10.5f %10.5f %10.5f %10.5f %10.5f %10.5f\n'
             %(     Var1val,   Var2val,       smi,      step,  Swin_max,  SWin_int,  Qnet_max,  Qnet_int,    LE_max,    LE_int,
 	         LEveg_max, LEveg_int,LEsoil_max,LEsoil_int, LEliq_max, LEliq_int,    SH_max,    SH_int,    GR_max,    GR_int,
 		evafra_ave,  beta_ave,    Ra_14h,    Ra_ave,    Rs_14h,    Rs_ave,  Anet_min,  Resp_max,   NEE_min,   wce_min,
@@ -490,7 +515,9 @@ if __name__ == "__main__":
 		WUEplt_std,WUEeco_std,WUEint_std,    tm_ran,    tm_max,    qm_ave,   co2_ran,   co2_min,     h_max,     h_ran,
 		 lcl_h_min,    wg_ran,    ts_max, wqe_h_int, wqs_h_int,   wqe_wqs,   wqe_int,   VPD_ave,    CD_ave,  Anet_SUM,
 		   DTU_SUM,       DVR,evafra_14h, SWnet_12h, SWnet_int,   thetam0,       lai,      cveg,    qm_18h,   wts_int,
-	           wte_int, wts_h_int, wte_h_int) )
+	           wte_int, wts_h_int, wte_h_int,    w2_ran,      wg_i,      w2_i) )
+            
+	    print Var1val,   Var2val,  Swin_max
 ######################################
 
         Results.write(line)

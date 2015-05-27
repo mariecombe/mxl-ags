@@ -2,13 +2,13 @@
 
 ###### USER DEFINED : ######
 
-Listoffiles="namoptions_cc*wg*"
-Outputdir="TESTEST"
+Listoffiles="namoptions_cc*ga*"
+Outputdir="2DIM_SA_cc_0-30_gammatheta_2-8_SMI=0.2"
 
 ############################
 
 cd ../
-find Files_scripts/create_sensitivity/ -name ${Listoffiles} | xargs -I '{}' mv {} .
+find Scripts/create_namoptions/ -name ${Listoffiles} | xargs -I '{}' mv {} .
 
 rm SensitivityRuns.txt
 #rm -r SENS_wg*

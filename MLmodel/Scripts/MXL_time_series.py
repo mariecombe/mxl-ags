@@ -89,69 +89,90 @@ You do not need to specify any arguments to run this script:
             sys.exit(2)
 
     # Current directory
+    
     currentdir = "/Users/mariecombe/Modeling/MXL/MLmodel/DROUGHT"
     folderlist = [f for f in os.listdir( currentdir ) if ( f.startswith('SENS_') ) ]
-    
     outputfileslist = ['output_dyn','output_sca']
 
+    
+    cases = ['P4001','P4101']
+    subtitles = [r'Drought-sensitive vegetation (linear $\beta$)',r'Drought-insensitive vegetation (curved $\beta$)']
+
+    # Reading the output
+    
     Results = {}
+    for case in cases:
+        for folder in folderlist:
+            if (case in folder):
+                # Read all results files and store all dictionnaries into one dictionnary
+                Results[folder] = open_MXLoutput(currentdir,outputfileslist,folder,[])
+                Results[folder]['output_dyn']['new_time(h)'] = Results[folder]['output_dyn']['RT(hours)'] + (float(folder[12:15])-1.)*24.
+    print "Read all output! \n"
     
-    plt.close('fig')
-    fig = plt.figure('fig', figsize=(16,8)) 
-
-    plt.ylabel(r'heat sflux (W m$^{-2}$)')
-    
-    ax1 = plt.subplot(211)
-    plt.ylim([0.,400.])
-    plt.ylabel(r'heat flux (W m$^{-2}$)')
-    ax2 = ax1.twinx()
-    
-    for folder in folderlist:
-        # Read all results files and store all dictionnaries into one dictionnary
-        Results[folder] = open_MXLoutput(currentdir,outputfileslist,folder,[])
-	Results[folder]['output_dyn']['new_time(h)'] = Results[folder]['output_dyn']['RT(hours)'] + (float(folder[12:15])-1.)*24.
-	
-	if (("P4001" in folder) and ("wg001" in folder)): 
-	    ax1.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['LE(W.m-2)'], c='k', label='LE')
-#	    ax1.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['SH(W.m-2)'], c='r', label='SH')
-    	    ax2.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_sca']['wg(cm3.cm-3)'], c='b', label='wg')
-	elif ("P4001" in folder):
-	    ax1.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['LE(W.m-2)'], c='k')
-#	    ax1.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['SH(W.m-2)'], c='r')
-	    ax2.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_sca']['wg(cm3.cm-3)'], c='b')
-    plt.xlabel('time (h)')
-    plt.ylabel(r'soil moisture (cm$^{3}$ cm$^{-3}$)')
-    ax1.legend(loc='upper right')
-    ax2.legend(loc='lower right')
-    plt.xlim([0.,530.])
-    plt.ylim([0.06,0.11])
-    plt.title(r'Drought-sensitive vegetation (linear $\beta$)')
+    plt.close('fig1')
+    plt.close('fig2')
 
     
-    ax1 = plt.subplot(212)
-    plt.ylabel(r'heat flux (W m$^{-2}$)')
-    plt.ylim([0.,400.])
-    ax2 = ax1.twinx()
+    # Figure 1: LE and wg
     
-    for folder in folderlist:
-	if (("P4002" in folder) and ("wg001" in folder)): 
-	    ax1.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['LE(W.m-2)'], c='k', label='LE')
-#	    ax1.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['SH(W.m-2)'], c='r', label='SH')
-	    ax2.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_sca']['wg(cm3.cm-3)'], c='b', label='wg')
-	elif ("P4002" in folder):
-	    ax1.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['LE(W.m-2)'], c='k')
-#	    ax1.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['SH(W.m-2)'], c='r')
-	    ax2.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_sca']['wg(cm3.cm-3)'], c='b')
+    fig = plt.figure('fig1', figsize=(16,8)) 
+    a=210
+    for i,case in enumerate(cases):
+        a = a + 1
+	ax1 = plt.subplot(a)
+        plt.ylabel(r'heat sflux (W m$^{-2}$)')
+        plt.ylim([0.,400.])
+        ax2 = ax1.twinx()
+    
+        for folder in folderlist:
+            if ((case in folder) and ("wg001" in folder)): 
+	        ax1.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['LE(W.m-2)'], c='k', label='LE')
+	        ax1.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['LEveg(W.m-2)'], ls='--', c='r', label='LEveg')
+    	        ax2.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_sca']['w2(cm3.cm-3)'], c='b', label='w2')
+    	        #ax2.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_sca']['w2(cm3.cm-3)'], ls='--', c='b', label='w2')
+	    elif (case in folder):
+	        ax1.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['LE(W.m-2)'], c='k')
+	        ax1.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['LEveg(W.m-2)'], ls='--', c='r')
+	        ax2.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_sca']['w2(cm3.cm-3)'], c='b')
+    	        #ax2.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_sca']['w2(cm3.cm-3)'], ls='--', c='b')
+        plt.xlabel('time (h)')
+        plt.ylabel(r'soil moisture (cm$^{3}$ cm$^{-3}$)')
+        ax1.legend(loc='upper right')
+        ax2.legend(loc='center right')
+        plt.xlim([0.,530.])
+        plt.ylim([0.06,0.11])
+        plt.title(subtitles[i])
 
     plt.xlabel('time (h)')
-    plt.ylabel(r'soil moisture (cm$^{3}$ cm$^{-3}$)')
-    ax1.legend(loc='upper right')
-    ax2.legend(loc='lower right')
-    plt.xlim([0.,530.])
-    plt.ylim([0.06,0.11])
-    plt.title(r'Drought-insensitive vegetation (curved $\beta$)')
+
+    # Figure 2: h and theta
+    
+    fig = plt.figure('fig2', figsize=(16,8)) 
+    a=210
+    for i,case in enumerate(cases):
+        a = a + 1
+	ax1 = plt.subplot(a)
+        plt.ylabel('ABL height (m)')
+        plt.ylim([0.,1800.])
+        ax2 = ax1.twinx()
+    
+        for folder in folderlist:
+            if ((case in folder) and ("wg001" in folder)): 
+	        ax1.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['zi(m)'], c='k', label='h')
+    	        ax2.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['thetam(K)'], c='b', label=r'$\theta$')
+	    elif (case in folder):
+	        ax1.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['zi(m)'], c='k')
+	        ax2.plot(Results[folder]['output_dyn']['new_time(h)'], Results[folder]['output_dyn']['thetam(K)'], c='b')
+        plt.xlabel('time (h)')
+        plt.ylabel(r'$\theta$ (K)')
+        ax1.legend(loc='upper right')
+        ax2.legend(loc='center right')
+        plt.xlim([0.,530.])
+        #plt.ylim([0.06,0.11])
+        plt.title(subtitles[i])
 
     plt.xlabel('time (h)')
+
 	
     plt.show()
 	
